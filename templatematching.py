@@ -9,8 +9,8 @@ import time
 from pkg_resources import resource_filename
 
 haarlocation = resource_filename(__name__, './haarcascade_frontalface_default.xml')
-imgLocation = resource_filename(__name__, './3eyes.jpeg')
-imgLocation = cv.imread('./pv.jpeg')
+# imgLocation = resource_filename(__name__, './3eyes.jpeg')
+imgLocation = cv.imread('./face-default.png')
 hog_detctor = dlib.get_frontal_face_detector()
 face_cascade = cv.CascadeClassifier(haarlocation)
 
@@ -120,12 +120,12 @@ while (done):
   # Use SSD detector with 20% confidence threshold.
   # faces = fd.haar_detect(img_copy,1.3,5,0)
 #   faces = fd.haar_detect(img_copy,1.3,1,0)
-  faces = fd.ssd_detect(img_copy, conf=0.2, returnconf=True)
+#   faces = fd.ssd_detect(img_copy, conf=0.2, returnconf=True)
   # faces = face_cascade.detectMultiScale(img_copy) #cascade
   # faces = fd.cnn_detect(img_copy)
 
-  faces = fd.haar_detect(frame)
-  faces = fd.haar_detect(frame,scaleFactor = 1.3, minNeighbors = 5, height=0)
+#   faces = fd.haar_detect(frame)
+#   faces = fd.haar_detect(frame,scaleFactor = 1.3, minNeighbors = 5, height=0)
 
 #   c=0.9
 
@@ -137,30 +137,31 @@ while (done):
 #   cv.imshow("Faces in webcam", frame )
 
   # Apply template Matching
-#   res = cv.matchTemplate(img_copy,imgLocation,cv.TM_SQDIFF)
-#   print(imgLocation.shape)
-#   w, h = imgLocation.shape[:-1]
-#   min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-#   top_left = min_loc
-#   bottom_right = (top_left[0] + w, top_left[1] + h)
-#   faces = cv.rectangle(img_copy,top_left, bottom_right, 255, 2)
-#   print(faces)
-#   x = faces[0] 
-  x,y,w,h,c = faces[0] # use with ssd 
+  res = cv.matchTemplate(img_copy,imgLocation,cv.TM_SQDIFF)
+  print(imgLocation.shape)
+  w, h = imgLocation.shape[:-1]
+  min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+  top_left = min_loc
+  bottom_right = (top_left[0] + w, top_left[1] + h)
+  faces = cv.rectangle(img_copy,top_left, bottom_right, 255, 2)
+  print(faces)
+  x = faces[0] 
+#   x,y,w,h,c = faces[0] # use with ssd 
 #   faces = fd.haar_detect(img_copy,1.3,1,0)
 #   x,y,w,h = faces[0] # use with haar
     # Define padding for face roi
   padding = 3
     # Extract the Face from image with padding.
-  face = img_copy[y-padding:y+h+padding,x-padding:x+w+padding] 
-  # face = img_copy[y:y+h, x:x+w] 
+#   face = img_copy[y-padding:y+h+padding,x-padding:x+w+padding] 
+#   face = img_copy[y:y+h, x:x+w] 
+  face = img_copy 
 
 # Just increasing the padding for demo purpose
   # padding = 20
 
 # Get the Padded face
-  padded_face_demo = img_copy[y-padding:y+h+padding,x-padding:x+w+padding] 
-#   padded_face_demo = img_copy 
+#   padded_face_demo = img_copy[y-padding:y+h+padding,x-padding:x+w+padding] 
+  padded_face_demo = img_copy 
 
   # plt.figure(figsize=[10, 10])
   gray = cv.cvtColor(img_copy,cv.COLOR_BGR2GRAY)
@@ -188,12 +189,14 @@ while (done):
   
 # Get the final probablities 
   # find frequency of pixels in range 0-255
-  for (x,y,w,h,c) in faces:
+  c=0.9
+  for (x,y,w) in x:
     cv.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),2)
     cv.putText(frame,'Rosto detectado {:.2f}%'.format(c*100),(x,y+h+15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2, cv.LINE_AA)
 
 #   cv.putText(frame, 'FPS: {:.2f} {}'.format(fps, 'using    haar'), (10, 20), cv.FONT_HERSHEY_SIMPLEX,0.8, (255, 20, 55), 1)
-  cv.imshow("Faces in webcam", frame )
+#   cv.putText(frame,'Rosto detectado ', cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2, cv.LINE_AA)
+  cv.imshow("Faces in webcam", faces )
   # if cont == 2: break
   if cv.waitKey(5) == 27:
     break
